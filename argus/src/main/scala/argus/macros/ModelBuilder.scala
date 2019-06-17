@@ -52,13 +52,7 @@ class ModelBuilder[U <: Universe](val u: U) {
       // If required, then don't wrap in Option
       val optional = !requiredFields.getOrElse(Nil).contains(field.name)
 
-      val enums = field.schema.enum.getOrElse(List())
-      val defval: Option[Select] = if (enums.length == 1) 
-          Some(enumName(name, field.name, enums.head))
-        else 
-          None
-
-      val (valDef, defDef) = mkValDef(path :+ name, field, optional, defval)
+      val (valDef, defDef) = mkValDef(path :+ name, field, optional)
       (valDefs :+ valDef, defDefs ++ defDef)
     }
 
@@ -94,13 +88,6 @@ class ModelBuilder[U <: Universe](val u: U) {
     val defs = baseDef :: q"""object ${TermName(baseName + "Enums")} { ..$memberDefs }""" :: Nil
 
     (typ, defs)
-  }
-
-  /**
-    * The fully-qualified name of an enum case.
-    */
-  def enumName(ownerName: String, fieldName: String, caseName: String): Select = {
-    Select(Select(Ident(TermName(ownerName)), TermName(fieldName.capitalize + "Enums")), TermName(nameFromJson(caseName)))
   }
 
   /**
@@ -290,19 +277,15 @@ class ModelBuilder[U <: Universe](val u: U) {
     * Makes a value definition (e.g. val i: Int). These are used for constructing parameter lists
     * and declaring local objects
     */
-  def mkValDef(path: List[String], field: Field, optional: Boolean, defval: Option[Select] = None): (ValDef, List[Tree]) = {
+  def mkValDef(path: List[String], field: Field, optional: Boolean): (ValDef, List[Tree]) = {
     val schema = field.schema
 
     val (typ, defs) = mkType(path, schema, field.name.capitalize)
 
     val valDef = (if (optional) {
-      val dval = defval.map({ x => q"Some(${x})" }).getOrElse(q"None")
-      q"val ${TermName(field.name)}: ${inOption(typ)} = ${dval}"
+      q"val ${TermName(field.name)}: ${inOption(typ)} = None"
     } else {
-      defval match {
-        case None => q"val ${TermName(field.name)}: ${typ}"
-        case Some(dval) => q"val ${TermName(field.name)}: ${typ} = ${dval}"
-      }
+      q"val ${TermName(field.name)}: $typ"
     }).asInstanceOf[ValDef]
 
     (valDef, defs)
