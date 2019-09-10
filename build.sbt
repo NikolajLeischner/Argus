@@ -1,6 +1,6 @@
 import ReleaseTransformations._
 
-lazy val Vers = new {
+lazy val Versions = new {
   val circe = "0.11.1"
   val scalatest = "3.0.1"
 }
@@ -8,13 +8,13 @@ lazy val Vers = new {
 lazy val commonSettings = Seq(
   name := "Argus",
   organization := "com.github.aishfenton",
-  scalaVersion := "2.12.2",
-  crossScalaVersions := Seq("2.11.11", "2.12.2"),
-  scalacOptions ++= Seq("-target:jvm-1.8", "-Ypartial-unification"),
+  scalaVersion := "2.12.9",
+  crossScalaVersions := Seq("2.12.9"),
+  scalacOptions ++= Seq("-Ypartial-unification"),
   homepage := Some(url("https://github.com/aishfenton/Argus")),
   licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/MIT")),
 
-  addCompilerPlugin("org.scalamacros" %% "paradise" % "2.1.0" cross CrossVersion.full),
+  addCompilerPlugin("org.scalamacros" %% "paradise" % "2.1.1" cross CrossVersion.full),
 
   // NB: We put example schemas in main package since otherwise the macros can't run for test (since they
   // excute before test-classes is populated). But then we need to exclude them from packing.
@@ -86,13 +86,13 @@ lazy val argus = project.
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "org.scala-lang" % "scala-compiler" % scalaVersion.value % Provided,
 
-      "io.circe" %% "circe-core" % Vers.circe,
-      "io.circe" %% "circe-generic" % Vers.circe,
-      "io.circe" %% "circe-parser" % Vers.circe,
-      "io.circe" %% "circe-java8" % Vers.circe,
+      "io.circe" %% "circe-core" % Versions.circe,
+      "io.circe" %% "circe-generic" % Versions.circe,
+      "io.circe" %% "circe-parser" % Versions.circe,
+      "io.circe" %% "circe-java8" % Versions.circe,
 
-      "org.scalactic" %% "scalactic" % Vers.scalatest % Test,
-      "org.scalatest" %% "scalatest" % Vers.scalatest % Test
+      "org.scalactic" %% "scalactic" % Versions.scalatest % Test,
+      "org.scalatest" %% "scalatest" % Versions.scalatest % Test
     )
   )
 
